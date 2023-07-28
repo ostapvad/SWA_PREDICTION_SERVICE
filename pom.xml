@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>swa.weather_app</groupId>
 	<artifactId>prediction_service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>prediction_service</name>
 	<description>Prediction service for weather app</description>
 	<properties>
@@ -25,16 +25,6 @@
 					<artifactId>snakeyaml</artifactId>
 					<groupId>org.yaml</groupId>
 				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-			<exclusion>
-				<artifactId>snakeyaml</artifactId>
-				<groupId>org.yaml</groupId>
-			</exclusion>
 			</exclusions>
 		</dependency>
 
