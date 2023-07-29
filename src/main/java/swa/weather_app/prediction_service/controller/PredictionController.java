@@ -4,12 +4,14 @@ package swa.weather_app.prediction_service.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import swa.weather_app.prediction_service.entity.HourPrediction;
 import swa.weather_app.prediction_service.entity.WeatherMeasurement;
 import swa.weather_app.prediction_service.entity.WindData;
@@ -28,6 +30,9 @@ public class PredictionController {
     RestTemplate restTemplate;
     private final Logger LOGGER = LoggerFactory.getLogger(RestController.class);
 
+    @Value("${backingServiceUrl}")
+    private String backingServiceUrl;
+
     @GetMapping("/")
     public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("Weather prediction service is OK.", HttpStatus.OK);
@@ -36,22 +41,23 @@ public class PredictionController {
     @GetMapping("/prediction")
     public ResponseEntity<WeatherPrediction> GetCityPrediction(@RequestParam(name = "city") String city)
             throws NotEnoughDataToPredict {
+        var now = LocalDateTime.now();
 
-        LocalDateTime curTime = LocalDateTime.now();
-        String getMeasurementsUrlHeader = "http://localhost:8082/measurements";
-        String MeasurementsUrl = String.format("%s?city=%s&from=%s&to=%s", getMeasurementsUrlHeader, city,
-                curTime.minusDays(1), curTime);
-        System.out.println(MeasurementsUrl);
+        var url = UriComponentsBuilder.fromHttpUrl(backingServiceUrl)
+                .path("/measurements")
+                .queryParam("city", city)
+                .queryParam("from", now)
+                .queryParam("to", now.minusDays(1)).toUriString();
 
-            ResponseEntity<List<WeatherMeasurement>> response = restTemplate.exchange(
-                    MeasurementsUrl,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<>() {
-                    }
-            );
+        ResponseEntity<List<WeatherMeasurement>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
 
-        WeatherPrediction weatherPrediction = predictionService.computePrediction(curTime, city, response.getBody());
+        WeatherPrediction weatherPrediction = predictionService.computePrediction(now, city, response.getBody());
         LOGGER.info(String.format("Prediction is computed for city = %s", city));
         return ResponseEntity.status(HttpStatus.OK).body(weatherPrediction);
 
