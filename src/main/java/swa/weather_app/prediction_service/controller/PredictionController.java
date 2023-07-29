@@ -21,14 +21,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/prediction")
 public class PredictionController {
     @Autowired
     PredictionService predictionService;
     @Autowired
     RestTemplate restTemplate;
     private final Logger LOGGER = LoggerFactory.getLogger(RestController.class);
-    @GetMapping()
+
+    @GetMapping("/")
+    public ResponseEntity<String> healthCheck() {
+        return new ResponseEntity<>("Weather prediction service is OK.", HttpStatus.OK);
+    }
+
+    @GetMapping("/prediction")
     public ResponseEntity<WeatherPrediction> GetCityPrediction(@RequestParam(name = "city") String city)
             throws NotEnoughDataToPredict {
 
