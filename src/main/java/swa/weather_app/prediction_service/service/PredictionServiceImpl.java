@@ -15,15 +15,12 @@ import java.util.List;
 
 @Service
 public class PredictionServiceImpl implements  PredictionService{
-    private final long MinutesMeasurementsOffset = 120;
+    private final long MinutesMeasurementsOffset = 24 * 60 + 120;;
 
 
     @Override
     public WeatherPrediction computePrediction(LocalDateTime curTime, String city, List<WeatherMeasurement> weatherMeasurementList) throws NotEnoughDataToPredict {
 
-        //        weatherMeasurementList.sort(Comparator.comparing(WeatherMeasurement::getTime));
-//        HourPrediction hourPrediction1 = new HourPrediction(2F, 1015, 64, new WindData(0.62F, 349, 1.18F));
-//        HourPrediction hourPrediction2 = new HourPrediction(3F, 1014, 66, new WindData(0.5F, 322, 1.11F));
         List<HourPrediction> computedPredictions = new ArrayList<>();
         for(int time_offset = 0; time_offset  < 24; time_offset ++){
             List<WeatherMeasurement> curTimeRelatedMeasurements = new ArrayList<>();
@@ -38,8 +35,6 @@ public class PredictionServiceImpl implements  PredictionService{
                             weatherMeasurementList.size()));
             computedPredictions.add(AveragePrediction(curTimeRelatedMeasurements));
         }
-
-        // add some logic
         return new WeatherPrediction(curTime, city, computedPredictions);
 
     }
