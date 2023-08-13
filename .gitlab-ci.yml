@@ -15,7 +15,7 @@ build_job:
     - apk --no-cache add maven
     - mvn package
     - mkdir app_jars
-   # - mv target/*.jar app_jars/backingService.jar
+    - mv target/*.jar app_jars/predictionService.jar
 
   artifacts:
     expire_in: 1 hrs
@@ -34,8 +34,8 @@ build_docker_image_job:
   stage: build-docker-image
   before_script:
     - mkdir target
- #   - cp app_jars/backingService.jar target/backingService.jar
+    - cp app_jars/predictionService.jar target/predictionService.jar
   script:
     - echo "Building Docker image..."
-  #  - docker build -t backing_service:latest .
+    - docker build -t prediction_service:latest .
 
