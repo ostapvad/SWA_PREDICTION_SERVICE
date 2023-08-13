@@ -1,0 +1,41 @@
+image: docker:20.10.16
+
+services:
+  - docker:20.10.16-dind
+
+stages:         
+  - build-app
+  - test-app
+  - build-docker-image
+
+build_job:
+  stage: build-app
+  script:
+    - echo "Building Spring Boot app..."
+    - apk --no-cache add maven
+    - mvn package
+    - mkdir app_jars
+   # - mv target/*.jar app_jars/backingService.jar
+
+  artifacts:
+    expire_in: 1 hrs
+    paths:
+      - app_jars
+    
+
+test_job:
+  stage: test-app
+  script:  
+    - echo "Running tests..."
+    - apk --no-cache add openjdk17 maven
+    - mvn test
+
+build_docker_image_job:
+  stage: build-docker-image
+  before_script:
+    - mkdir target
+ #   - cp app_jars/backingService.jar target/backingService.jar
+  script:
+    - echo "Building Docker image..."
+  #  - docker build -t backing_service:latest .
+
